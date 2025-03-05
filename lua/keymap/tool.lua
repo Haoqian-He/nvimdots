@@ -117,7 +117,7 @@ local mappings = {
 			:with_noremap()
 			:with_silent()
 			:with_desc("tool: Find files"),
-		["n|<leader>fp"] = map_callback(function()
+		["n|<leader>fw"] = map_callback(function()
 				require("search").open({ collection = "pattern" })
 			end)
 			:with_noremap()

@@ -26,8 +26,8 @@ local mappings = {
 		["n|<A-q>"] = map_cr("BufDel"):with_noremap():with_silent():with_desc("buffer: Close current"),
 
 		-- Plugin: bufferline.nvim
-		["n|<A-i>"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent():with_desc("buffer: Switch to next"),
-		["n|<A-o>"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent():with_desc("buffer: Switch to prev"),
+		["n|<A-j>"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent():with_desc("buffer: Switch to next"),
+		["n|<A-k>"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent():with_desc("buffer: Switch to prev"),
 		["n|<A-S-i>"] = map_cr("BufferLineMoveNext")
 			:with_noremap()
 			:with_silent()
@@ -49,13 +49,13 @@ local mappings = {
 		["n|<A-9>"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent():with_desc("buffer: Goto buffer 9"),
 
 		-- Plugin: smart-splits.nvim
-		["n|<A-h>"] = map_cu("SmartResizeLeft")
+		["n|<A-[>"] = map_cu("SmartResizeLeft")
 			:with_silent()
 			:with_noremap()
 			:with_desc("window: Resize -3 horizontally"),
-		["n|<A-j>"] = map_cu("SmartResizeDown"):with_silent():with_noremap():with_desc("window: Resize -3 vertically"),
-		["n|<A-k>"] = map_cu("SmartResizeUp"):with_silent():with_noremap():with_desc("window: Resize +3 vertically"),
-		["n|<A-l>"] = map_cu("SmartResizeRight")
+		["n|<A-u>"] = map_cu("SmartResizeDown"):with_silent():with_noremap():with_desc("window: Resize -3 vertically"),
+		["n|<A-i>"] = map_cu("SmartResizeUp"):with_silent():with_noremap():with_desc("window: Resize +3 vertically"),
+		["n|<A-]>"] = map_cu("SmartResizeRight")
 			:with_silent()
 			:with_noremap()
 			:with_desc("window: Resize +3 horizontally"),

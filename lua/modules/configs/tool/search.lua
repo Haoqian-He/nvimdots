@@ -15,8 +15,8 @@ return function()
 							opts = opts or {}
 							if vim.fn.getcwd() == vim_path then
 								builtin.find_files(vim.tbl_deep_extend("force", opts, { no_ignore = true }))
-							elseif vim.fn.isdirectory(".git") == 1 then
-								builtin.git_files(opts)
+							-- elseif vim.fn.isdirectory(".git") == 1 then
+							-- 	builtin.git_files(opts)
 							else
 								builtin.find_files(opts)
 							end
