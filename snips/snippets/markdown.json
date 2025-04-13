@@ -1,0 +1,21 @@
+{
+  "C Code Block": {
+    "prefix": "mdc",
+    "body": [
+      "```c",
+      "$0",
+      "```"
+    ],
+    "description": "Insert C code block in Markdown"
+  },
+  "Bash Code Block": {
+    "prefix": "mdb",
+    "body": [
+      "```bash",
+      "$0",
+      "```"
+    ],
+    "description": "Insert Bash code block in Markdown"
+  }
+}
+
