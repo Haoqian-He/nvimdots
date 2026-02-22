@@ -10,7 +10,7 @@ settings["use_copilot"] = true
 
 -- Set to false if you don't want to format on save.
 ---@type boolean
-settings["format_on_save"] = true
+settings["format_on_save"] = false
 
 -- Format timeout in milliseconds.
 ---@type number

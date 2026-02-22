@@ -53,8 +53,8 @@ local mappings = {
 			:with_silent()
 			:with_noremap()
 			:with_desc("window: Resize -3 horizontally"),
-		["n|<A-j>"] = map_cu("SmartResizeDown"):with_silent():with_noremap():with_desc("window: Resize -3 vertically"),
-		["n|<A-k>"] = map_cu("SmartResizeUp"):with_silent():with_noremap():with_desc("window: Resize +3 vertically"),
+		--["n|<A-j>"] = map_cu("SmartResizeDown"):with_silent():with_noremap():with_desc("window: Resize -3 vertically"),
+		--["n|<A-k>"] = map_cu("SmartResizeUp"):with_silent():with_noremap():with_desc("window: Resize +3 vertically"),
 		["n|<A-l>"] = map_cu("SmartResizeRight")
 			:with_silent()
 			:with_noremap()

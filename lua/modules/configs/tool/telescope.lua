@@ -21,7 +21,19 @@ return function()
 			path_display = { "absolute" },
 			selection_strategy = "reset",
 			color_devicons = true,
-			file_ignore_patterns = { ".git/", ".cache", "build/", "%.class", "%.pdf", "%.mkv", "%.mp4", "%.zip" },
+			file_ignore_patterns = {
+				".git/",
+				".cache",
+				"build/",
+				"%.class",
+				"%.pdf",
+				"%.mkv",
+				"%.mp4",
+				"%.zip",
+				"build%d*/",
+				"%.pb.h",
+				"%.pb.cc",
+			},
 			layout_config = {
 				horizontal = {
 					preview_width = 0.55,
