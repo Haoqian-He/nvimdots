@@ -1,5 +1,7 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/clangd.lua
 
+local uv = vim.uv or vim.loop
+
 local function switch_source_header_splitcmd(bufnr, splitcmd, client)
 	local method_name = "textDocument/switchSourceHeader"
 	---@diagnostic disable-next-line:param-type-mismatch
@@ -60,29 +62,99 @@ local function get_binary_path_list(binaries)
 	return table.concat(path_list, ",")
 end
 
+local function is_file(path)
+	local stat = uv.fs_stat(path)
+	return stat ~= nil and stat.type == "file"
+end
+
+local function is_dir(path)
+	local stat = uv.fs_stat(path)
+	return stat ~= nil and stat.type == "directory"
+end
+
+local function find_compile_commands_dir(root_dir)
+	if not root_dir or root_dir == "" then
+		return nil
+	end
+
+	if is_file(vim.fs.joinpath(root_dir, "compile_commands.json")) then
+		return root_dir
+	end
+
+	local candidates = {
+		"build",
+		"build-debug",
+		"build-release",
+		"cmake-build-debug",
+		"cmake-build-release",
+		"cmake-build-relwithdebinfo",
+		"debug",
+		"release",
+		"out",
+		"out/build",
+	}
+
+	for _, candidate in ipairs(candidates) do
+		local dir = vim.fs.joinpath(root_dir, candidate)
+		if is_dir(dir) and is_file(vim.fs.joinpath(dir, "compile_commands.json")) then
+			return dir
+		end
+	end
+
+	for name, file_type in vim.fs.dir(root_dir) do
+		if file_type == "directory" and (name:match("^build") or name:match("^cmake%-build")) then
+			local dir = vim.fs.joinpath(root_dir, name)
+			if is_file(vim.fs.joinpath(dir, "compile_commands.json")) then
+				return dir
+			end
+		end
+	end
+
+	return nil
+end
+
+local base_cmd = {
+	"clangd",
+	"-j=20",
+	"--enable-config",
+	-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
+	"--query-driver=" .. get_binary_path_list({ "clang++", "clang", "gcc", "g++" }),
+	"--all-scopes-completion",
+	"--background-index",
+	"--clang-tidy",
+	"--completion-parse=auto",
+	"--completion-style=bundled",
+	"--function-arg-placeholders",
+	"--header-insertion-decorators",
+	"--header-insertion=iwyu",
+	"--limit-references=1000",
+	"--limit-results=300",
+	"--pch-storage=memory",
+}
+
+local function build_clangd_cmd(root_dir)
+	local cmd = vim.deepcopy(base_cmd)
+	local compile_commands_dir = find_compile_commands_dir(root_dir)
+	if compile_commands_dir then
+		table.insert(cmd, "--compile-commands-dir=" .. compile_commands_dir)
+	end
+	return cmd
+end
+
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/clangd.lua
 return function(defaults)
 	vim.lsp.config("clangd", {
+		name = "clangd",
 		capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, defaults.capabilities),
 		single_file_support = true,
-		cmd = {
-			"clangd",
-			"-j=9",
-			"--enable-config",
-			-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-			"--query-driver=" .. get_binary_path_list({ "clang++", "clang", "gcc", "g++" }),
-			"--all-scopes-completion",
-			"--background-index",
-			"--clang-tidy",
-			"--completion-parse=auto",
-			"--completion-style=bundled",
-			"--function-arg-placeholders",
-			"--header-insertion-decorators",
-			"--header-insertion=iwyu",
-			"--limit-references=1000",
-			"--limit-results=300",
-			"--pch-storage=memory",
-		},
+		root_markers = { ".clangd", "compile_commands.json", "compile_flags.txt", "CMakeLists.txt", ".git" },
+		cmd = function(dispatchers, config)
+			return vim.lsp.rpc.start(build_clangd_cmd(config.root_dir), dispatchers, {
+				cwd = config.cmd_cwd,
+				env = config.cmd_env,
+				detached = config.detached,
+			})
+		end,
 		on_attach = function(client, bufnr)
 			vim.api.nvim_buf_create_user_command(bufnr, "LspClangdSwitchSourceHeader", function()
 				switch_source_header_splitcmd(bufnr, "edit", client)
