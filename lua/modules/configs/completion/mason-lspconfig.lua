@@ -113,8 +113,14 @@ please REMOVE your LSP configuration (rust_analyzer.lua) from the `servers` dire
 		mason_lsp_handler(srv)
 	end
 
-	for _, pkg in ipairs(mason_registry.get_installed_package_names()) do
+	local installed_packages = mason_registry.get_installed_package_names()
+
+	for _, pkg in ipairs(installed_packages) do
 		setup_lsp_for_package(pkg)
+	end
+
+	if vim.fn.executable("clangd") == 1 and not vim.list_contains(installed_packages, "clangd") then
+		mason_lsp_handler("clangd")
 	end
 end
 
