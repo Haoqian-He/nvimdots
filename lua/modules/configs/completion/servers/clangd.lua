@@ -1,6 +1,21 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/clangd.lua
 
 local uv = vim.uv or vim.loop
+local root_markers = { ".clangd", "compile_commands.json", "compile_flags.txt", "CMakeLists.txt", ".git" }
+
+local function get_clangd_binary()
+	local preferred = "/usr/bin/clangd"
+	if vim.fn.executable(preferred) == 1 then
+		return preferred
+	end
+
+	local resolved = vim.fn.exepath("clangd")
+	if resolved ~= "" then
+		return resolved
+	end
+
+	return "clangd"
+end
 
 local function switch_source_header_splitcmd(bufnr, splitcmd, client)
 	local method_name = "textDocument/switchSourceHeader"
@@ -114,7 +129,7 @@ local function find_compile_commands_dir(root_dir)
 end
 
 local base_cmd = {
-	"clangd",
+	get_clangd_binary(),
 	"-j=20",
 	"--enable-config",
 	-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
@@ -124,7 +139,7 @@ local base_cmd = {
 	"--clang-tidy",
 	"--completion-parse=auto",
 	"--completion-style=bundled",
-	"--function-arg-placeholders",
+	"--function-arg-placeholders=true",
 	"--header-insertion-decorators",
 	"--header-insertion=iwyu",
 	"--limit-references=1000",
@@ -141,16 +156,31 @@ local function build_clangd_cmd(root_dir)
 	return cmd
 end
 
+local function show_clangd_config(client)
+	local root_dir = client.config.root_dir
+	local compile_commands_dir = find_compile_commands_dir(root_dir)
+	local cwd = client.config.cmd_cwd or root_dir or vim.uv.cwd()
+	local lines = {
+		("client: %s"):format(client.name),
+		("root_dir: %s"):format(root_dir or "<nil>"),
+		("cwd: %s"):format(cwd or "<nil>"),
+		("compile_commands_dir: %s"):format(compile_commands_dir or "<nil>"),
+		("cmd: %s"):format(table.concat(build_clangd_cmd(root_dir), " ")),
+	}
+
+	vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "clangd config" })
+end
+
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/configs/clangd.lua
 return function(defaults)
 	vim.lsp.config("clangd", {
 		name = "clangd",
 		capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, defaults.capabilities),
 		single_file_support = true,
-		root_markers = { ".clangd", "compile_commands.json", "compile_flags.txt", "CMakeLists.txt", ".git" },
+		root_markers = root_markers,
 		cmd = function(dispatchers, config)
 			return vim.lsp.rpc.start(build_clangd_cmd(config.root_dir), dispatchers, {
-				cwd = config.cmd_cwd,
+				cwd = config.cmd_cwd or config.root_dir,
 				env = config.cmd_env,
 				detached = config.detached,
 			})
@@ -171,6 +201,10 @@ return function(defaults)
 			vim.api.nvim_buf_create_user_command(bufnr, "LspClangdShowSymbolInfo", function()
 				symbol_info(bufnr, client)
 			end, { desc = "Show symbol info" })
+
+			vim.api.nvim_buf_create_user_command(bufnr, "LspClangdShowConfig", function()
+				show_clangd_config(client)
+			end, { desc = "Show clangd root/cmd/compile_commands config" })
 		end,
 	})
 end

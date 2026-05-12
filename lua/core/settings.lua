@@ -116,7 +116,6 @@ settings["lsp_inlayhints"] = false
 ---@type string[]
 settings["lsp_deps"] = {
 	"bashls",
-	"clangd",
 	"gopls",
 	"html",
 	"jsonls",
