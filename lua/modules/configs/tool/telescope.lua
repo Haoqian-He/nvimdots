@@ -24,7 +24,7 @@ return function()
 			file_ignore_patterns = {
 				".git/",
 				".cache",
-				"build/",
+				"build%d*/",
 				"%.class",
 				"%.pdf",
 				"%.mkv",
