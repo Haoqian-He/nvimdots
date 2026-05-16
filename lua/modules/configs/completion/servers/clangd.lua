@@ -130,7 +130,7 @@ end
 
 local base_cmd = {
 	get_clangd_binary(),
-	"-j=20",
+	"-j=12",
 	"--enable-config",
 	-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
 	"--query-driver=" .. get_binary_path_list({ "clang++", "clang", "gcc", "g++" }),
