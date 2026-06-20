@@ -186,6 +186,11 @@ return function(defaults)
 			})
 		end,
 		on_attach = function(client, bufnr)
+			local ok, constexpr_value = pcall(require, "completion.constexpr-value")
+			if ok then
+				constexpr_value.attach(bufnr, client)
+			end
+
 			vim.api.nvim_buf_create_user_command(bufnr, "LspClangdSwitchSourceHeader", function()
 				switch_source_header_splitcmd(bufnr, "edit", client)
 			end, { desc = "Open source/header in a new vsplit" })

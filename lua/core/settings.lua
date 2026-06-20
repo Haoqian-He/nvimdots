@@ -111,6 +111,10 @@ settings["search_backend"] = "telescope"
 ---@type boolean
 settings["lsp_inlayhints"] = false
 
+-- Show evaluated values for C/C++ constexpr variables using clangd hover.
+---@type boolean
+settings["cpp_constexpr_values"] = true
+
 -- LSPs to install during bootstrap.
 -- Full list: https://github.com/neovim/nvim-lspconfig/tree/master/lua/lspconfig/configs
 ---@type string[]
