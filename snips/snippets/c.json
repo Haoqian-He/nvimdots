@@ -7,5 +7,12 @@
       "}"
     ],
     "description": "Code snippet for 'fori' loop"
+  },
+  "fprintf sterr": {
+    "prefix": "fpe",
+    "body": [
+      "fprintf(stderr, \"[haoqian %s:%d]\\n\", __FUNCTION__, __LINE__);"
+    ],
+    "description": "Code snippet for 'fprintf stderr"
   }
 }
