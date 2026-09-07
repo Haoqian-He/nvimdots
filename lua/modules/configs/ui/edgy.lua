@@ -19,10 +19,10 @@ return function()
 			q = false,
 			Q = false,
 			["<C-q>"] = false,
-			["<A-j>"] = function(win)
+			["<A-i>"] = function(win)
 				win:resize("height", -2)
 			end,
-			["<A-k>"] = function(win)
+			["<A-o>"] = function(win)
 				win:resize("height", 2)
 			end,
 			["<A-h>"] = function(win)
